@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+dist/
+build/
+**/dist/
+**/build/
+
+# Environment files
+.env
+**/.env
+!**/.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# Upload files (backend)
+backend/uploads/
+
+# Expo / React Native
+.expo/
+web-build/
+
+# OS
+.DS_Store
+*.pem
