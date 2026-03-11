@@ -1,0 +1,17 @@
+/*
+ * styles/index.css — Global stylesheet imported in main.jsx.
+ *
+ * This directory (frontend/src/styles/) contains application-wide CSS files:
+ *
+ *   index.css   — Tailwind CSS directives (@tailwind base/components/utilities)
+ *                 and any project-level CSS custom properties (design tokens,
+ *                 colour palette, typography scale, etc.)
+ *
+ * Component-scoped styles should use Tailwind utility classes directly on the
+ * JSX element, or CSS Modules (<Component>.module.css) co-located next to the
+ * component file, rather than being placed here.
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
