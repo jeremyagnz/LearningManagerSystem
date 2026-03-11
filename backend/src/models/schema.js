@@ -34,6 +34,7 @@ const createTables = async () => {
       subject_id INTEGER NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
       title VARCHAR(255) NOT NULL,
       description TEXT,
+      file_url VARCHAR(500),
       due_date TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -65,6 +66,12 @@ const createTables = async () => {
   for (const query of queries) {
     await pool.query(query);
   }
+
+  // Migrations: add columns that may not exist in older installations
+  await pool.query(`
+    ALTER TABLE assignments
+    ADD COLUMN IF NOT EXISTS file_url VARCHAR(500)
+  `);
 
   console.log('Database tables created successfully');
 };

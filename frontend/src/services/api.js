@@ -47,8 +47,12 @@ export const assignmentAPI = {
   getBySubject: (subjectId) => API.get(`/assignments/subject/${subjectId}`),
   getById: (id) => API.get(`/assignments/${id}`),
   getMyAssignments: () => API.get('/assignments/my'),
-  create: (data) => API.post('/assignments', data),
-  update: (id, data) => API.put(`/assignments/${id}`, data),
+  create: (formData) => API.post('/assignments', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
+  update: (id, formData) => API.put(`/assignments/${id}`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  }),
   delete: (id) => API.delete(`/assignments/${id}`),
 };
 
