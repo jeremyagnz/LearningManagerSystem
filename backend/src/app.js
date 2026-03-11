@@ -1,0 +1,55 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const { createTables } = require('./models/schema');
+const { defaultLimiter, authLimiter } = require('./middleware/rateLimiter');
+
+const authRoutes = require('./routes/auth');
+const subjectRoutes = require('./routes/subjects');
+const assignmentRoutes = require('./routes/assignments');
+const submissionRoutes = require('./routes/submissions');
+const materialRoutes = require('./routes/materials');
+
+const app = express();
+
+app.use(cors({
+  origin: process.env.FRONTEND_URL || '*',
+  credentials: true,
+}));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+app.use('/api/auth', authLimiter, authRoutes);
+app.use('/api/subjects', defaultLimiter, subjectRoutes);
+app.use('/api/assignments', defaultLimiter, assignmentRoutes);
+app.use('/api/submissions', defaultLimiter, submissionRoutes);
+app.use('/api/materials', defaultLimiter, materialRoutes);
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(err.status || 500).json({ message: err.message || 'Internal server error' });
+});
+
+const PORT = process.env.PORT || 5000;
+
+const start = async () => {
+  try {
+    await createTables();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
+};
+
+start();
+
+module.exports = app;
