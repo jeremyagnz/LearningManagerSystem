@@ -120,13 +120,57 @@ npx expo start
 
 ## Environment Variables
 
+### Backend (`backend/.env`)
+
 ```env
 PORT=5000
 DATABASE_URL=postgresql://user:password@localhost:5432/lms_db
 JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRES_IN=7d
 NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
 ```
+
+### Frontend (`frontend/.env`)
+
+```env
+# For local development, leave this unset — Vite's dev-server proxy forwards /api/* to localhost:5000.
+# For production (e.g. Netlify), set this to your deployed backend's full API URL:
+# VITE_API_URL=https://your-lms-backend.onrender.com/api
+VITE_API_URL=
+```
+
+## Deployment
+
+### Frontend → Netlify
+
+1. Connect your repository to Netlify.
+2. Configure the build settings (these match `netlify.toml`):
+   - **Base directory:** `frontend`
+   - **Build command:** `npm run build`
+   - **Publish directory:** `dist`
+3. Add the environment variable in **Site configuration → Environment variables**:
+   | Key | Value |
+   |-----|-------|
+   | `VITE_API_URL` | `https://your-lms-backend.onrender.com/api` |
+
+   Replace the example value with your actual deployed backend URL (must end in `/api`).
+4. Trigger a new deploy so Netlify rebuilds the frontend with the variable baked in.
+
+### Backend → Render / Railway / Heroku
+
+Set the following environment variables on your backend host:
+
+```env
+PORT=5000
+DATABASE_URL=postgresql://prod_user:prod_pass@prod_host/lms_db
+JWT_SECRET=your_production_secret
+JWT_EXPIRES_IN=7d
+NODE_ENV=production
+FRONTEND_URL=https://your-netlify-site.netlify.app
+```
+
+`FRONTEND_URL` is used by the backend's CORS configuration — make sure it matches your Netlify domain exactly.
 
 ## License
 MIT

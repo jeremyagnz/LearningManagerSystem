@@ -3,3 +3,24 @@
   command = "npm run build"
   publish = "dist"
 
+# Proxy /api/* requests to the backend server.
+# Set VITE_API_URL to your deployed backend's full API URL, including the /api path
+# (e.g. https://your-api.onrender.com/api), in the Netlify environment variables
+# so the frontend can reach the backend.
+# The redirect below provides an alternative path-based proxy when the backend
+# is hosted at a known URL and you prefer not to use VITE_API_URL.
+# Replace the placeholder with your actual backend URL and uncomment the block.
+#
+# [[redirects]]
+#   from   = "/api/*"
+#   to     = "https://YOUR_BACKEND_URL/api/:splat"
+#   status = 200
+#   force  = true
+
+# SPA fallback — must be the LAST redirect rule.
+# Sends all unmatched paths to index.html so React Router handles them.
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
