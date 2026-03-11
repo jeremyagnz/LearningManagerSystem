@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { subjectAPI, assignmentAPI, materialAPI } from '../../services/api';
-import { FiArrowLeft, FiPlus, FiTrash2, FiUsers, FiClipboard, FiBookOpen, FiLink, FiFile } from 'react-icons/fi';
+import { FiArrowLeft, FiPlus, FiTrash2, FiUsers, FiClipboard, FiBookOpen, FiLink, FiFile, FiDownload } from 'react-icons/fi';
 
 const SubjectDetail = () => {
   const { id } = useParams();
@@ -14,6 +14,7 @@ const SubjectDetail = () => {
 
   const [showAssignmentForm, setShowAssignmentForm] = useState(false);
   const [assignmentForm, setAssignmentForm] = useState({ title: '', description: '', due_date: '' });
+  const [assignmentFile, setAssignmentFile] = useState(null);
   const [savingAssignment, setSavingAssignment] = useState(false);
 
   const [showMaterialForm, setShowMaterialForm] = useState(false);
@@ -48,9 +49,16 @@ const SubjectDetail = () => {
     e.preventDefault();
     setSavingAssignment(true);
     try {
-      await assignmentAPI.create({ ...assignmentForm, subject_id: id });
+      const formData = new FormData();
+      formData.append('subject_id', id);
+      formData.append('title', assignmentForm.title);
+      if (assignmentForm.description) formData.append('description', assignmentForm.description);
+      if (assignmentForm.due_date) formData.append('due_date', assignmentForm.due_date);
+      if (assignmentFile) formData.append('file', assignmentFile);
+      await assignmentAPI.create(formData);
       setShowAssignmentForm(false);
       setAssignmentForm({ title: '', description: '', due_date: '' });
+      setAssignmentFile(null);
       await fetchData();
     } catch (err) {
       console.error(err);
@@ -179,8 +187,13 @@ const SubjectDetail = () => {
                       onChange={(e) => setAssignmentForm({ ...assignmentForm, due_date: e.target.value })}
                       className="w-full border border-gray-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-indigo-500" />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Attachment (optional)</label>
+                    <input type="file" onChange={(e) => setAssignmentFile(e.target.files[0])}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+                  </div>
                   <div className="flex space-x-3">
-                    <button type="button" onClick={() => setShowAssignmentForm(false)} className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50">Cancel</button>
+                    <button type="button" onClick={() => { setShowAssignmentForm(false); setAssignmentForm({ title: '', description: '', due_date: '' }); setAssignmentFile(null); }} className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50">Cancel</button>
                     <button type="submit" disabled={savingAssignment} className="flex-1 bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50">
                       {savingAssignment ? 'Creating...' : 'Create'}
                     </button>
@@ -200,6 +213,12 @@ const SubjectDetail = () => {
                     <p className="font-medium text-gray-900">{a.title}</p>
                     <p className="text-sm text-gray-500">{a.description}</p>
                     {a.due_date && <p className="text-xs text-gray-400 mt-1">Due: {new Date(a.due_date).toLocaleString()}</p>}
+                    {a.file_url && (
+                      <a href={a.file_url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center space-x-1 text-xs text-indigo-600 hover:underline mt-1">
+                        <FiDownload className="h-3 w-3" /><span>Attachment</span>
+                      </a>
+                    )}
                   </div>
                   <div className="flex items-center space-x-3">
                     <Link to={`/teacher/assignments/${a.id}/submissions`} className="text-indigo-600 text-sm hover:underline">

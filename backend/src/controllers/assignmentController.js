@@ -4,13 +4,15 @@ const createAssignment = async (req, res) => {
   const { subject_id, title, description, due_date } = req.body;
   if (!subject_id || !title) return res.status(400).json({ message: 'subject_id and title are required' });
 
+  const file_url = req.file ? `/uploads/${req.file.filename}` : null;
+
   try {
     const check = await pool.query('SELECT * FROM subjects WHERE id = $1 AND teacher_id = $2', [subject_id, req.user.id]);
     if (check.rows.length === 0) return res.status(403).json({ message: 'Forbidden' });
 
     const result = await pool.query(
-      'INSERT INTO assignments (subject_id, title, description, due_date) VALUES ($1, $2, $3, $4) RETURNING *',
-      [subject_id, title, description, due_date || null]
+      'INSERT INTO assignments (subject_id, title, description, file_url, due_date) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+      [subject_id, title, description, file_url, due_date || null]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -48,6 +50,9 @@ const getAssignmentById = async (req, res) => {
 const updateAssignment = async (req, res) => {
   const { id } = req.params;
   const { title, description, due_date } = req.body;
+  if (!title) return res.status(400).json({ message: 'title is required' });
+  const file_url = req.file ? `/uploads/${req.file.filename}` : undefined;
+
   try {
     const check = await pool.query(
       `SELECT a.* FROM assignments a
@@ -58,8 +63,10 @@ const updateAssignment = async (req, res) => {
     if (check.rows.length === 0) return res.status(403).json({ message: 'Forbidden' });
 
     const result = await pool.query(
-      'UPDATE assignments SET title = $1, description = $2, due_date = $3, updated_at = CURRENT_TIMESTAMP WHERE id = $4 RETURNING *',
-      [title, description, due_date || null, id]
+      `UPDATE assignments SET title = $1, description = $2, due_date = $3,
+        file_url = COALESCE($4, file_url), updated_at = CURRENT_TIMESTAMP
+       WHERE id = $5 RETURNING *`,
+      [title, description, due_date || null, file_url ?? null, id]
     );
     res.json(result.rows[0]);
   } catch (err) {
@@ -90,8 +97,10 @@ const deleteAssignment = async (req, res) => {
 const getStudentAssignments = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT a.*, s.title as subject_title,
-        sub.id as submission_id, sub.file_url, sub.grade, sub.submitted_at
+      `SELECT a.id, a.subject_id, a.title, a.description, a.file_url as assignment_file_url,
+        a.due_date, a.created_at, s.title as subject_title,
+        sub.id as submission_id, sub.file_url as submission_file_url,
+        sub.grade, sub.submitted_at
        FROM assignments a
        JOIN subjects s ON a.subject_id = s.id
        JOIN enrollments e ON e.subject_id = s.id

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { assignmentAPI, submissionAPI } from '../../services/api';
-import { FiCalendar, FiUpload, FiCheckCircle, FiClock } from 'react-icons/fi';
+import { FiCalendar, FiUpload, FiCheckCircle, FiClock, FiDownload } from 'react-icons/fi';
 
 const StudentAssignments = () => {
   const [assignments, setAssignments] = useState([]);
@@ -148,6 +148,12 @@ const AssignmentCard = ({ assignment: a, onSubmit, isPending }) => (
           <FiCalendar className="h-3 w-3" />
           <span>Due: {new Date(a.due_date).toLocaleString()}</span>
         </span>
+      )}
+      {a.assignment_file_url && (
+        <a href={a.assignment_file_url} target="_blank" rel="noopener noreferrer"
+          className="flex items-center space-x-1 text-xs text-indigo-600 hover:underline mt-1">
+          <FiDownload className="h-3 w-3" /><span>Download Attachment</span>
+        </a>
       )}
     </div>
     <div className="flex flex-col items-end space-y-2">
