@@ -2,7 +2,7 @@
  * seed.js — Creates demo accounts so developers and reviewers can log in
  * immediately without having to register.
  *
- * Demo credentials (always available in development):
+ * Demo credentials:
  *   Teacher  →  demo.teacher@lms.com  /  demo1234
  *   Student  →  demo.student@lms.com  /  demo1234
  */
@@ -26,8 +26,6 @@ const DEMO_USERS = [
 ];
 
 const seedDemoUsers = async () => {
-  if (process.env.NODE_ENV === 'production') return;
-
   try {
     for (const u of DEMO_USERS) {
       const { rows } = await pool.query('SELECT id FROM users WHERE email = $1', [u.email]);
