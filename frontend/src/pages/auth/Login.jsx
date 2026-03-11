@@ -55,39 +55,35 @@ const Login = () => {
           <p className="text-gray-500 mt-1">Sign in to your LMS account</p>
         </div>
 
-        {/* Demo access — only shown in development builds */}
-        {import.meta.env.DEV && (
-          <div className="mb-6 rounded-xl border border-indigo-100 bg-indigo-50 p-4">
-            <p className="text-xs font-semibold text-indigo-500 uppercase tracking-wide mb-3">
-              Acceso Rápido (Demo)
-            </p>
-            <div className="grid grid-cols-2 gap-2">
-              {DEMO_ACCOUNTS.map((acc) => (
-                <button
-                  key={acc.email}
-                  type="button"
-                  disabled={loading}
-                  onClick={() => handleDemoLogin(acc.email, acc.password)}
-                  className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
-                    acc.color === 'indigo'
-                      ? 'bg-indigo-600 text-white hover:bg-indigo-700'
-                      : 'bg-emerald-600 text-white hover:bg-emerald-700'
-                  }`}
-                >
-                  {acc.label}
-                </button>
-              ))}
-            </div>
+        {/* Demo access */}
+        <div className="mb-6 rounded-xl border border-indigo-100 bg-indigo-50 p-4">
+          <p className="text-xs font-semibold text-indigo-500 uppercase tracking-wide mb-3">
+            Acceso Rápido (Demo)
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {DEMO_ACCOUNTS.map((acc) => (
+              <button
+                key={acc.email}
+                type="button"
+                disabled={loading}
+                onClick={() => handleDemoLogin(acc.email, acc.password)}
+                className={`py-2 px-3 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
+                  acc.color === 'indigo'
+                    ? 'bg-indigo-600 text-white hover:bg-indigo-700'
+                    : 'bg-emerald-600 text-white hover:bg-emerald-700'
+                }`}
+              >
+                {acc.label}
+              </button>
+            ))}
           </div>
-        )}
+        </div>
 
-        {import.meta.env.DEV && (
-          <div className="relative flex items-center gap-3 mb-5">
-            <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 font-medium">o ingresa tus datos</span>
-            <div className="flex-1 h-px bg-gray-200" />
-          </div>
-        )}
+        <div className="relative flex items-center gap-3 mb-5">
+          <div className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs text-gray-400 font-medium">o ingresa tus datos</span>
+          <div className="flex-1 h-px bg-gray-200" />
+        </div>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
