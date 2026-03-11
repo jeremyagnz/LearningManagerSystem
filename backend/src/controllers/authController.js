@@ -5,14 +5,6 @@ const pool = require('../config/database');
 const register = async (req, res) => {
   const { name, email, password, role } = req.body;
 
-  if (!name || !email || !password || !role) {
-    return res.status(400).json({ message: 'All fields are required' });
-  }
-
-  if (!['student', 'teacher'].includes(role)) {
-    return res.status(400).json({ message: 'Role must be student or teacher' });
-  }
-
   try {
     const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
     if (existing.rows.length > 0) {
@@ -41,10 +33,6 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and password are required' });
-  }
 
   try {
     const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);

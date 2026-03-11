@@ -30,4 +30,10 @@ const requireRole = (...roles) => {
   };
 };
 
-module.exports = { authMiddleware, requireRole };
+/**
+ * roleMiddleware — factory that returns a middleware enforcing one or more allowed roles.
+ * Alias for requireRole; exported under the name specified in the project requirements.
+ */
+const roleMiddleware = requireRole;
+
+module.exports = { authMiddleware, requireRole, roleMiddleware };
