@@ -1,8 +1,16 @@
-require('dotenv').config();
+/**
+ * app.js — Express application factory for the LMS backend.
+ *
+ * Configures and exports the Express app without starting the HTTP server.
+ * Keeping app creation and server startup separate lets tests import the app
+ * without binding to a port and makes the code easier to reason about.
+ *
+ * The actual server start (app.listen) lives in the top-level server.js.
+ */
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { createTables } = require('./models/schema');
 const { defaultLimiter, authLimiter } = require('./middleware/rateLimiter');
 
 const authRoutes = require('./routes/auth');
@@ -35,21 +43,5 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(err.status || 500).json({ message: err.message || 'Internal server error' });
 });
-
-const PORT = process.env.PORT || 5000;
-
-const start = async () => {
-  try {
-    await createTables();
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  } catch (err) {
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  }
-};
-
-start();
 
 module.exports = app;
