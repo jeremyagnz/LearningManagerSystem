@@ -56,6 +56,30 @@ A fullstack Learning Management System built with React + Vite (frontend), Node.
 
 ### 1 — Create the PostgreSQL database
 
+**Option A — automated script (recommended)**
+
+From the repository root:
+
+```bash
+bash scripts/create-db.sh
+```
+
+Pass optional arguments to use a different PostgreSQL user, host, or port:
+
+```bash
+bash scripts/create-db.sh <pg_user> <pg_host> <pg_port>
+# e.g. bash scripts/create-db.sh myuser 127.0.0.1 5433
+```
+
+Or use the npm shortcut from the `backend/` directory:
+
+```bash
+cd backend
+npm run db:create
+```
+
+**Option B — manual psql**
+
 Open a terminal and run:
 
 ```bash
