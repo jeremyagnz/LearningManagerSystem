@@ -7,6 +7,7 @@ const TeacherAssignments = () => {
   const [subjects, setSubjects] = useState([]);
   const [selected, setSelected] = useState('');
   const [assignments, setAssignments] = useState([]);
+  const [subjectsLoading, setSubjectsLoading] = useState(true);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -15,7 +16,8 @@ const TeacherAssignments = () => {
         setSubjects(res.data);
         if (res.data.length > 0) setSelected(res.data[0].id);
       })
-      .catch(console.error);
+      .catch(console.error)
+      .finally(() => setSubjectsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -26,6 +28,14 @@ const TeacherAssignments = () => {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [selected]);
+
+  if (subjectsLoading) {
+    return (
+      <div className="flex justify-center py-20">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div>
