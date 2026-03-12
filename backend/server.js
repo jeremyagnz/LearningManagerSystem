@@ -24,6 +24,9 @@ const start = async () => {
     await seedDemoUsers();
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+      console.log(`Health check: http://localhost:${PORT}/api/health`);
+      const maskedDbUrl = (process.env.DATABASE_URL || '').replace(/:[^:@]*@/, ':***@');
+      console.log(`Database: ${maskedDbUrl || '(DATABASE_URL not set)'}`);
     });
   } catch (err) {
     console.error('Failed to start server:', err);
