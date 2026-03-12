@@ -14,14 +14,7 @@ API.interceptors.request.use((config) => {
 
 API.interceptors.response.use(
   (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(err);
-  }
+  (err) => Promise.reject(err)
 );
 
 export const authAPI = {

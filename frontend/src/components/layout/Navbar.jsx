@@ -11,7 +11,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const studentLinks = [
@@ -27,7 +27,8 @@ const Navbar = () => {
     { to: '/teacher/assignments', label: 'Assignments' },
   ];
 
-  const links = user?.role === 'teacher' ? teacherLinks : studentLinks;
+  const isTeacher = user?.role === 'teacher' || location.pathname.startsWith('/teacher');
+  const links = isTeacher ? teacherLinks : studentLinks;
 
   return (
     <nav className="bg-indigo-600 text-white shadow-md">
@@ -51,7 +52,7 @@ const Navbar = () => {
               </Link>
             ))}
             <Link
-              to={user?.role === 'teacher' ? '/teacher/profile' : '/student/profile'}
+              to={isTeacher ? '/teacher/profile' : '/student/profile'}
               className="flex items-center space-x-1 text-indigo-100 hover:text-white"
             >
               <FiUser className="h-4 w-4" />
