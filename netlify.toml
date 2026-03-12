@@ -3,22 +3,30 @@
   command = "npm run build"
   publish = "dist"
 
-# Proxy /api/* requests to the backend server.
-# Set VITE_API_URL to your deployed backend's full API URL, including the /api path
-# (e.g. https://your-api.onrender.com/api), in the Netlify environment variables
-# so the frontend can reach the backend.
-# The redirect below provides an alternative path-based proxy when the backend
-# is hosted at a known URL and you prefer not to use VITE_API_URL.
-# Replace the placeholder with your actual backend URL and uncomment the block.
+# ─── API proxy ────────────────────────────────────────────────────────────────
+# Netlify can't run the Node.js backend, so we need to proxy /api/* requests to
+# the separately-deployed backend service (e.g. Render, Railway, Heroku).
 #
-# [[redirects]]
-#   from   = "/api/*"
-#   to     = "https://YOUR_BACKEND_URL/api/:splat"
-#   status = 200
-#   force  = true
+# How to configure:
+#   1. Deploy the backend (see README → "Backend → Render / Railway / Heroku").
+#   2. In the Netlify dashboard go to:
+#        Site configuration → Environment variables
+#      and add:
+#        BACKEND_URL = https://your-lms-backend.onrender.com
+#        (no trailing slash; do NOT include /api — that is added below)
+#   3. Trigger a new Netlify deploy so the variable is picked up.
+#
+# Without BACKEND_URL set, all /api/* requests will return 404 because Netlify
+# has no backend to forward them to.
+[[redirects]]
+  from   = "/api/*"
+  to     = "${BACKEND_URL}/api/:splat"
+  status = 200
+  force  = true
 
-# SPA fallback — must be the LAST redirect rule.
-# Sends all unmatched paths to index.html so React Router handles them.
+# ─── SPA fallback ─────────────────────────────────────────────────────────────
+# Must be the LAST redirect rule.
+# Sends all unmatched paths to index.html so React Router handles them client-side.
 [[redirects]]
   from   = "/*"
   to     = "/index.html"

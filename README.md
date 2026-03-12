@@ -296,13 +296,20 @@ VITE_API_URL=
    - **Base directory:** `frontend`
    - **Build command:** `npm run build`
    - **Publish directory:** `dist`
-3. Add the environment variable in **Site configuration → Environment variables**:
+3. Add the following environment variable in **Site configuration → Environment variables**:
+
    | Key | Value |
    |-----|-------|
-   | `VITE_API_URL` | `https://your-lms-backend.onrender.com/api` |
+   | `BACKEND_URL` | `https://your-lms-backend.onrender.com` |
 
-   Replace the example value with your actual deployed backend URL (must end in `/api`).
-4. Trigger a new deploy so Netlify rebuilds the frontend with the variable baked in.
+   This is used by the `netlify.toml` proxy redirect that forwards all `/api/*`
+   requests from the Netlify site to your deployed backend. Without it, every
+   API call (including login) returns **404**.
+
+   > **Note:** do not include a trailing slash or the `/api` path — the
+   > redirect rule appends those automatically.
+
+4. Trigger a new deploy so Netlify picks up the variable.
 
 ### Backend → Render / Railway / Heroku
 
@@ -326,6 +333,7 @@ FRONTEND_URL=https://your-netlify-site.netlify.app
 
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
+| `404 Not Found` on `/api/auth/login` (Netlify) | `BACKEND_URL` not set in Netlify environment variables | Add `BACKEND_URL=https://your-lms-backend.onrender.com` in **Site configuration → Environment variables** and trigger a new deploy |
 | `Server error` on login | Backend can't connect to the database | Check `DATABASE_URL` in `backend/.env`; if using Supabase make sure you copied the correct connection string and that SSL is enabled |
 | `Invalid credentials` | Wrong email/password | Use the demo credentials from the table above, or register a new account at `/register` |
 | Login page never loads | Frontend can't reach the backend | Make sure the backend is running on port 5000 **before** opening the frontend |
