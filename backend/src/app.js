@@ -23,7 +23,9 @@ const materialRoutes = require('./routes/materials');
 const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: process.env.FRONTEND_URL
+    ? process.env.FRONTEND_URL.split(',').map((o) => o.trim())
+    : true,
   credentials: true,
 }));
 app.use(express.json());

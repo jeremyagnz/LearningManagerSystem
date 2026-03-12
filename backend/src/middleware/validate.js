@@ -16,7 +16,8 @@ const { ALL_ROLES } = require('../config/constants');
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    const errorList = errors.array();
+    return res.status(400).json({ message: errorList[0].msg, errors: errorList });
   }
   next();
 };
