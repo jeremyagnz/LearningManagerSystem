@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:16-alpine
+    # ⚠️  These credentials are for local development only.
+    # Use strong, unique credentials for any non-local deployment.
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lms_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      PORT: 5000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/lms_db
+      # ⚠️  Change JWT_SECRET to a long, random string before deploying anywhere
+      # outside of your local machine.  Never commit real secrets to source control.
+      JWT_SECRET: change_this_to_a_long_random_secret_in_production
+      JWT_EXPIRES_IN: 7d
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:5173
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:5000/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:

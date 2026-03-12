@@ -48,7 +48,23 @@ A fullstack Learning Management System built with React + Vite (frontend), Node.
 
 ## Getting Started
 
-### Prerequisites
+### Option 0 — Docker Compose (fastest, zero-config)
+
+If you have [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/) installed, you can spin up the entire stack (database + backend + frontend) with a single command:
+
+```bash
+docker-compose up --build
+```
+
+Then open `http://localhost:5173` and log in with the demo accounts below.
+
+> **What it does:** starts a PostgreSQL container, runs the backend (auto-creates tables and demo users on first start), and serves the compiled frontend — all pre-configured.
+
+> **To stop:** press `Ctrl+C`, then run `docker-compose down` (add `-v` to also remove the database volume).
+
+---
+
+### Manual Setup — Prerequisites
 - Node.js 18+
 - A **Supabase** project (free tier is sufficient) **or** a local PostgreSQL 14+ instance
 
