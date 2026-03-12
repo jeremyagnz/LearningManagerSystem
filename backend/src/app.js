@@ -12,6 +12,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { defaultLimiter, authLimiter } = require('./middleware/rateLimiter');
+const pool = require('./config/database');
 
 const authRoutes = require('./routes/auth');
 const subjectRoutes = require('./routes/subjects');
@@ -35,8 +36,20 @@ app.use('/api/assignments', defaultLimiter, assignmentRoutes);
 app.use('/api/submissions', defaultLimiter, submissionRoutes);
 app.use('/api/materials', defaultLimiter, materialRoutes);
 
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/api/health', defaultLimiter, async (req, res) => {
+  try {
+    await pool.query('SELECT 1');
+    res.json({ status: 'ok', db: 'connected', timestamp: new Date().toISOString() });
+  } catch (err) {
+    console.error('Health check DB error:', err.message);
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.status(503).json({
+      status: 'error',
+      db: 'disconnected',
+      message: isProduction ? 'Database unavailable' : err.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 app.use((err, req, res, next) => {
