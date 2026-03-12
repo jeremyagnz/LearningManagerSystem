@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, Link } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import Layout from './components/layout/Layout';
 
 import Login from './pages/auth/Login';
@@ -61,32 +62,34 @@ function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <Routes>
-          <Route path="/" element={<RootRedirect />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
+        <ErrorBoundary>
+          <Routes>
+            <Route path="/" element={<RootRedirect />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
-          {/* Student Routes */}
-          <Route element={<ProtectedRoute role="student"><Layout /></ProtectedRoute>}>
-            <Route path="/student" element={<StudentDashboard />} />
-            <Route path="/student/subjects" element={<StudentSubjects />} />
-            <Route path="/student/assignments" element={<StudentAssignments />} />
-            <Route path="/student/grades" element={<StudentGrades />} />
-            <Route path="/student/profile" element={<Profile />} />
-          </Route>
+            {/* Student Routes */}
+            <Route element={<ProtectedRoute role="student"><Layout /></ProtectedRoute>}>
+              <Route path="/student" element={<StudentDashboard />} />
+              <Route path="/student/subjects" element={<StudentSubjects />} />
+              <Route path="/student/assignments" element={<StudentAssignments />} />
+              <Route path="/student/grades" element={<StudentGrades />} />
+              <Route path="/student/profile" element={<Profile />} />
+            </Route>
 
-          {/* Teacher Routes */}
-          <Route element={<ProtectedRoute role="teacher"><Layout /></ProtectedRoute>}>
-            <Route path="/teacher" element={<TeacherDashboard />} />
-            <Route path="/teacher/subjects" element={<TeacherSubjects />} />
-            <Route path="/teacher/subjects/:id" element={<SubjectDetail />} />
-            <Route path="/teacher/assignments" element={<TeacherAssignments />} />
-            <Route path="/teacher/assignments/:assignmentId/submissions" element={<AssignmentSubmissions />} />
-            <Route path="/teacher/profile" element={<Profile />} />
-          </Route>
+            {/* Teacher Routes */}
+            <Route element={<ProtectedRoute role="teacher"><Layout /></ProtectedRoute>}>
+              <Route path="/teacher" element={<TeacherDashboard />} />
+              <Route path="/teacher/subjects" element={<TeacherSubjects />} />
+              <Route path="/teacher/subjects/:id" element={<SubjectDetail />} />
+              <Route path="/teacher/assignments" element={<TeacherAssignments />} />
+              <Route path="/teacher/assignments/:assignmentId/submissions" element={<AssignmentSubmissions />} />
+              <Route path="/teacher/profile" element={<Profile />} />
+            </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   );
