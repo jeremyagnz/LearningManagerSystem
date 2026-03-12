@@ -1,6 +1,6 @@
 # Learning Management System (LMS)
 
-A fullstack Learning Management System built with React + Vite (frontend), Node.js + Express (backend), PostgreSQL (database), and React Native + Expo (mobile).
+A fullstack Learning Management System built with React + Vite (frontend), Node.js + Express (backend), Supabase / PostgreSQL (database), and React Native + Expo (mobile).
 
 ## Tech Stack
 
@@ -8,7 +8,7 @@ A fullstack Learning Management System built with React + Vite (frontend), Node.
 |-----------|--------------------------|
 | Frontend  | React + Vite + TailwindCSS |
 | Backend   | Node.js + Express        |
-| Database  | PostgreSQL                |
+| Database  | Supabase (PostgreSQL)    |
 | Auth      | JWT (JSON Web Tokens)    |
 | Mobile    | React Native + Expo      |
 
@@ -50,13 +50,29 @@ A fullstack Learning Management System built with React + Vite (frontend), Node.
 
 ### Prerequisites
 - Node.js 18+
-- PostgreSQL 14+
+- A **Supabase** project (free tier is sufficient) **or** a local PostgreSQL 14+ instance
 
 ---
 
-### 1 — Create the PostgreSQL database
+### 1 — Set up the database
 
-**Option A — automated script (recommended)**
+#### Option A — Supabase (recommended)
+
+1. Create a free project at [supabase.com](https://supabase.com).
+2. Open the **SQL Editor** in the Supabase dashboard.
+3. Run the migration file to create all tables:
+   ```
+   supabase/migrations/001_initial_schema.sql
+   ```
+4. *(Optional)* Run the seed file to create the two demo accounts:
+   ```
+   supabase/seed.sql
+   ```
+5. Go to **Settings → Database** to find your connection string, and **Settings → API** to find your project URL and keys.
+
+#### Option B — Local PostgreSQL
+
+**Option B.1 — automated script (recommended)**
 
 From the repository root:
 
@@ -78,7 +94,7 @@ cd backend
 npm run db:create
 ```
 
-**Option B — manual psql**
+**Option B.2 — manual psql**
 
 Open a terminal and run:
 
@@ -104,7 +120,26 @@ cd backend
 cp .env.example .env
 ```
 
-Open `backend/.env` and fill in your database credentials:
+**For Supabase**, open `backend/.env` and set:
+
+```env
+PORT=5000
+
+# Supabase connection string (Transaction Pooler — from Settings → Database → Connection string)
+DATABASE_URL=postgresql://postgres.[project-id]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+
+# Supabase API settings (from Settings → API)
+SUPABASE_URL=https://[project-id].supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+
+JWT_SECRET=change_this_to_a_long_random_secret
+JWT_EXPIRES_IN=7d
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+```
+
+**For a local PostgreSQL instance**, set:
 
 ```env
 PORT=5000
@@ -123,8 +158,10 @@ npm run dev
 ```
 
 On first start the server automatically:
-1. Creates all database tables.
+1. Creates all database tables (if they do not already exist).
 2. Inserts two **demo accounts** (see below).
+
+> **Note for Supabase:** if you already ran the SQL migration and seed files in step 1, the server will skip creating tables/users that already exist.
 
 The backend runs on `http://localhost:5000`.
 
@@ -209,7 +246,16 @@ npx expo start
 
 ```env
 PORT=5000
-DATABASE_URL=postgresql://user:password@localhost:5432/lms_db
+
+# Supabase (recommended)
+DATABASE_URL=postgresql://postgres.[project-id]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+SUPABASE_URL=https://[project-id].supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
+
+# — or — Local PostgreSQL
+# DATABASE_URL=postgresql://user:password@localhost:5432/lms_db
+
 JWT_SECRET=your_jwt_secret_key_here
 JWT_EXPIRES_IN=7d
 NODE_ENV=development
@@ -248,7 +294,10 @@ Set the following environment variables on your backend host:
 
 ```env
 PORT=5000
-DATABASE_URL=postgresql://prod_user:prod_pass@prod_host/lms_db
+DATABASE_URL=postgresql://postgres.[project-id]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
+SUPABASE_URL=https://[project-id].supabase.co
+SUPABASE_ANON_KEY=your_supabase_anon_key_here
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
 JWT_SECRET=your_production_secret
 JWT_EXPIRES_IN=7d
 NODE_ENV=production
@@ -261,12 +310,12 @@ FRONTEND_URL=https://your-netlify-site.netlify.app
 
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
-| `Server error` on login | Backend can't connect to PostgreSQL | Check `DATABASE_URL` in `backend/.env`; make sure PostgreSQL is running and the `lms_db` database exists |
+| `Server error` on login | Backend can't connect to the database | Check `DATABASE_URL` in `backend/.env`; if using Supabase make sure you copied the correct connection string and that SSL is enabled |
 | `Invalid credentials` | Wrong email/password | Use the demo credentials from the table above, or register a new account at `/register` |
 | Login page never loads | Frontend can't reach the backend | Make sure the backend is running on port 5000 **before** opening the frontend |
 | `No token provided` / instant redirect to `/login` | JWT secret missing | Set a non-empty `JWT_SECRET` in `backend/.env` |
 | CORS error in browser console | `FRONTEND_URL` mismatch | Set `FRONTEND_URL=http://localhost:5173` in `backend/.env` |
-| Demo accounts not created | Seed ran before tables existed | Stop the server, verify the database is accessible, and restart with `npm run dev` |
+| Demo accounts not created | Seed ran before tables existed | Stop the server, verify the database is accessible, and restart with `npm run dev` (or run `supabase/seed.sql` manually in the Supabase SQL Editor) |
 
 ## License
 MIT
