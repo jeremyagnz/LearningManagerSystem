@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import Layout from './components/layout/Layout';
 
@@ -19,13 +19,10 @@ import TeacherAssignments from './pages/teacher/TeacherAssignments';
 import AssignmentSubmissions from './pages/teacher/AssignmentSubmissions';
 
 const RootRedirect = () => {
-  // TODO: Re-enable role-based redirect before production deployment.
-  // Auth temporarily disabled — always redirect to /student.
-  // const { user, loading } = useAuth();
-  // if (loading) return null;
-  // if (!user) return <Navigate to="/login" replace />;
-  // return <Navigate to={user.role === 'teacher' ? '/teacher' : '/student'} replace />;
-  return <Navigate to="/student" replace />;
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (!user) return <Navigate to="/login" replace />;
+  return <Navigate to={user.role === 'teacher' ? '/teacher' : '/student'} replace />;
 };
 
 function App() {
