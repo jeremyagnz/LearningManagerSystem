@@ -52,19 +52,61 @@ A fullstack Learning Management System built with React + Vite (frontend), Node.
 - Node.js 18+
 - PostgreSQL 14+
 
-### Backend Setup
+---
+
+### 1 — Create the PostgreSQL database
+
+Open a terminal and run:
+
+```bash
+psql -U postgres
+```
+
+Then inside the `psql` prompt:
+
+```sql
+CREATE DATABASE lms_db;
+\q
+```
+
+> If your PostgreSQL user or port differ, adjust the `DATABASE_URL` in `backend/.env` accordingly.
+
+---
+
+### 2 — Backend Setup
 
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env with your database credentials
+```
+
+Open `backend/.env` and fill in your database credentials:
+
+```env
+PORT=5000
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/lms_db
+JWT_SECRET=change_this_to_a_long_random_secret
+JWT_EXPIRES_IN=7d
+NODE_ENV=development
+FRONTEND_URL=http://localhost:5173
+```
+
+Then install dependencies and start the server:
+
+```bash
 npm install
 npm run dev
 ```
 
+On first start the server automatically:
+1. Creates all database tables.
+2. Inserts two **demo accounts** (see below).
+
 The backend runs on `http://localhost:5000`.
 
-### Frontend Setup
+---
+
+### 3 — Frontend Setup
 
 ```bash
 cd frontend
@@ -73,6 +115,25 @@ npm run dev
 ```
 
 The frontend runs on `http://localhost:5173`.
+
+The Vite dev-server proxies all `/api/*` requests to `http://localhost:5000`, so **no extra frontend configuration is needed for local development**.
+
+---
+
+### 4 — Log in
+
+Open `http://localhost:5173` in your browser. You will be redirected to the login page.
+
+#### Demo accounts (created automatically on first backend start)
+
+| Role    | Email                    | Password   |
+|---------|--------------------------|------------|
+| Teacher | demo.teacher@lms.com     | demo1234   |
+| Student | demo.student@lms.com     | demo1234   |
+
+Use the **"Acceso Rápido (Demo)"** buttons on the login page or enter the credentials manually.
+
+---
 
 ### Mobile Setup
 
@@ -171,6 +232,17 @@ FRONTEND_URL=https://your-netlify-site.netlify.app
 ```
 
 `FRONTEND_URL` is used by the backend's CORS configuration — make sure it matches your Netlify domain exactly.
+
+## Troubleshooting Login
+
+| Symptom | Likely cause | Fix |
+|---------|-------------|-----|
+| `Server error` on login | Backend can't connect to PostgreSQL | Check `DATABASE_URL` in `backend/.env`; make sure PostgreSQL is running and the `lms_db` database exists |
+| `Invalid credentials` | Wrong email/password | Use the demo credentials from the table above, or register a new account at `/register` |
+| Login page never loads | Frontend can't reach the backend | Make sure the backend is running on port 5000 **before** opening the frontend |
+| `No token provided` / instant redirect to `/login` | JWT secret missing | Set a non-empty `JWT_SECRET` in `backend/.env` |
+| CORS error in browser console | `FRONTEND_URL` mismatch | Set `FRONTEND_URL=http://localhost:5173` in `backend/.env` |
+| Demo accounts not created | Seed ran before tables existed | Stop the server, verify the database is accessible, and restart with `npm run dev` |
 
 ## License
 MIT
