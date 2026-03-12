@@ -12,6 +12,19 @@
  */
 
 require('dotenv').config();
+
+// Validate required environment variables before anything else.
+// Missing vars cause cryptic errors at runtime; catching them here produces a
+// clear, actionable message and exits early.
+const REQUIRED_ENV_VARS = ['DATABASE_URL', 'JWT_SECRET'];
+const missingVars = REQUIRED_ENV_VARS.filter((v) => !process.env[v]);
+if (missingVars.length > 0) {
+  console.error('❌  Missing required environment variables:', missingVars.join(', '));
+  console.error('   Copy backend/.env.example to backend/.env and fill in the values.');
+  console.error('   Or run `docker-compose up` from the repo root for automatic setup.');
+  process.exit(1);
+}
+
 const app = require('./src/app');
 const { createTables } = require('./src/models/schema');
 const { seedDemoUsers } = require('./src/models/seed');
