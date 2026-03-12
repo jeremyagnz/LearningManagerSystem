@@ -14,6 +14,7 @@ import GradesScreen from '../screens/student/GradesScreen';
 
 import TeacherHomeScreen from '../screens/teacher/TeacherHomeScreen';
 import TeacherSubjectsScreen from '../screens/teacher/TeacherSubjectsScreen';
+import TeacherAssignmentsScreen from '../screens/teacher/TeacherAssignmentsScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -56,6 +57,7 @@ const TeacherTabs = () => (
   >
     <Tab.Screen name="Home" component={TeacherHomeScreen} />
     <Tab.Screen name="Subjects" component={TeacherSubjectsScreen} />
+    <Tab.Screen name="Assignments" component={TeacherAssignmentsScreen} />
   </Tab.Navigator>
 );
 

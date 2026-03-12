@@ -37,6 +37,7 @@ export const assignmentAPI = {
   getById: (id) => API.get(`/assignments/${id}`),
   getMyAssignments: () => API.get('/assignments/my'),
   create: (data) => API.post('/assignments', data),
+  delete: (id) => API.delete(`/assignments/${id}`),
 };
 
 export const submissionAPI = {
