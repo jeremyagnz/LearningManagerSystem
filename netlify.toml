@@ -8,12 +8,15 @@
 # the separately-deployed backend service (e.g. Render, Railway, Heroku).
 #
 # How to configure:
-#   1. Deploy the backend (see README → "Backend → Render / Railway / Heroku").
+#   1. Deploy the backend first (see README → "Backend → Render").
+#      Using the included render.yaml the service will be named "lms-backend"
+#      and its URL will be: https://lms-backend.onrender.com
 #   2. In the Netlify dashboard go to:
 #        Site configuration → Environment variables
 #      and add:
-#        BACKEND_URL = https://your-lms-backend.onrender.com
-#        (no trailing slash; do NOT include /api — that is added below)
+#        BACKEND_URL = https://lms-backend.onrender.com
+#        (replace with your actual Render service URL; no trailing slash;
+#         do NOT include /api — that is added below)
 #   3. Trigger a new Netlify deploy so the variable is picked up.
 #
 # Without BACKEND_URL set, all /api/* requests will return 404 because Netlify
