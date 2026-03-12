@@ -289,7 +289,47 @@ VITE_API_URL=
 
 ## Deployment
 
+### Backend → Render (deploy this first to get your backend URL)
+
+The repository includes a `render.yaml` Blueprint file that configures the
+backend as a Render Web Service named **`lms-backend`**.
+
+1. Push this repository to your GitHub account.
+2. Go to [render.com](https://render.com) → **New → Blueprint** and connect the
+   repository. Render will read `render.yaml` automatically and create the
+   `lms-backend` service.
+3. In the Render dashboard, open the `lms-backend` service and go to
+   **Environment** to fill in the values that are marked `sync: false` in
+   `render.yaml`:
+
+   | Variable | Where to find it |
+   |----------|-----------------|
+   | `DATABASE_URL` | Supabase → Settings → Database → Connection string (Transaction Pooler) |
+   | `SUPABASE_URL` | Supabase → Settings → API → Project URL |
+   | `SUPABASE_ANON_KEY` | Supabase → Settings → API → anon / public |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role |
+   | `FRONTEND_URL` | Your Netlify site URL, e.g. `https://your-site.netlify.app` — set this after completing the Netlify deploy below; use a placeholder like `http://localhost:5173` for now |
+
+   `JWT_SECRET` is generated automatically by Render; you do not need to set it.
+
+4. Click **Deploy**. Once the deploy finishes, Render shows the service URL at
+   the top of the dashboard page — it will look like:
+
+   ```
+   https://lms-backend.onrender.com
+   ```
+
+   Copy this URL — you will need it in the next section.
+
+> **Manual setup (without `render.yaml`):** create a Web Service on Render
+> pointing to the `backend/` directory, set `Build Command` to `npm install`,
+> `Start Command` to `npm start`, and add the environment variables above.
+> The URL will be whatever name you gave the service.
+
 ### Frontend → Netlify
+
+> **Complete the Backend → Render step above first** so you have the backend
+> URL ready.
 
 1. Connect your repository to Netlify.
 2. Configure the build settings (these match `netlify.toml`):
@@ -300,40 +340,30 @@ VITE_API_URL=
 
    | Key | Value |
    |-----|-------|
-   | `BACKEND_URL` | `https://your-lms-backend.onrender.com` |
+   | `BACKEND_URL` | `https://lms-backend.onrender.com` (your Render service URL, no trailing slash) |
 
    This is used by the `netlify.toml` proxy redirect that forwards all `/api/*`
    requests from the Netlify site to your deployed backend. Without it, every
    API call (including login) returns **404**.
+
+   > **How to find your exact Render URL:** open the `lms-backend` service in
+   > the Render dashboard. The URL is displayed at the top of the page under
+   > the service name. If you named the service differently, the URL will match
+   > that name (e.g. `https://my-lms-api.onrender.com`).
 
    > **Note:** do not include a trailing slash or the `/api` path — the
    > redirect rule appends those automatically.
 
 4. Trigger a new deploy so Netlify picks up the variable.
 
-### Backend → Render / Railway / Heroku
-
-Set the following environment variables on your backend host:
-
-```env
-PORT=5000
-DATABASE_URL=postgresql://postgres.[project-id]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres
-SUPABASE_URL=https://[project-id].supabase.co
-SUPABASE_ANON_KEY=your_supabase_anon_key_here
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key_here
-JWT_SECRET=your_production_secret
-JWT_EXPIRES_IN=7d
-NODE_ENV=production
-FRONTEND_URL=https://your-netlify-site.netlify.app
-```
-
-`FRONTEND_URL` is used by the backend's CORS configuration — make sure it matches your Netlify domain exactly.
+5. *(Optional)* Go back to the Render `lms-backend` service → **Environment**
+   and update `FRONTEND_URL` to your Netlify site URL so CORS is locked down.
 
 ## Troubleshooting Login
 
 | Symptom | Likely cause | Fix |
 |---------|-------------|-----|
-| `404 Not Found` on `/api/auth/login` (Netlify) | `BACKEND_URL` not set in Netlify environment variables | Add `BACKEND_URL=https://your-lms-backend.onrender.com` in **Site configuration → Environment variables** and trigger a new deploy |
+| `404 Not Found` on `/api/auth/login` (Netlify) | `BACKEND_URL` not set in Netlify environment variables | Add `BACKEND_URL=https://lms-backend.onrender.com` (your Render service URL) in **Site configuration → Environment variables** and trigger a new deploy |
 | `Server error` on login | Backend can't connect to the database | Check `DATABASE_URL` in `backend/.env`; if using Supabase make sure you copied the correct connection string and that SSL is enabled |
 | `Invalid credentials` | Wrong email/password | Use the demo credentials from the table above, or register a new account at `/register` |
 | Login page never loads | Frontend can't reach the backend | Make sure the backend is running on port 5000 **before** opening the frontend |

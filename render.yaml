@@ -1,0 +1,31 @@
+services:
+  # ─── Backend API ─────────────────────────────────────────────────────────────
+  # Deploying this file to Render will create a Web Service whose URL will be:
+  #   https://lms-backend.onrender.com
+  # Use that URL as the BACKEND_URL environment variable in your Netlify site.
+  - type: web
+    name: lms-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: FRONTEND_URL
+        sync: false
